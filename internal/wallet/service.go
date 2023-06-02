@@ -2,6 +2,7 @@ package wallet
 
 import (
 	"context"
+	"errors"
 
 	"github.com/danielcesario/cdc-core/internal/user"
 	"github.com/google/uuid"
@@ -58,4 +59,35 @@ func (s *WalletService) List(ctx context.Context) ([]*WalletResponse, error) {
 	}
 
 	return response, nil
+}
+
+func (s *WalletService) AddCollaborator(ctx context.Context, walletCode string, request WalletCollaboratorRequest) error {
+	user, err := s.userRepository.FindByCode(request.UserCode)
+	if err != nil {
+		return err
+	}
+
+	userEmail := ctx.Value("user_email").(string)
+	currentUser, err := s.userRepository.FindByEmail(userEmail)
+	if err != nil {
+		return err
+	}
+
+	wallet, err := s.repository.FindByCode(walletCode)
+	if err != nil {
+		return err
+	}
+
+	if wallet.UserID != currentUser.ID {
+		return errors.New("invalid wallet owner")
+	}
+
+	wallet.Collaborators = append(wallet.Collaborators, *user)
+
+	_, err = s.repository.Store(wallet)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

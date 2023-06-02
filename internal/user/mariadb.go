@@ -24,6 +24,16 @@ func (r *mariaDBRepository) FindByEmail(email string) (*User, error) {
 	return &user, nil
 }
 
+func (r *mariaDBRepository) FindByCode(code string) (*User, error) {
+	var user User
+	record := r.db.Model(&User{}).Where("code = ?", code).First(&user)
+	if record.Error != nil {
+		return nil, record.Error
+	}
+
+	return &user, nil
+}
+
 func (r *mariaDBRepository) GetRoleByName(name string) (*Role, error) {
 	var role Role
 	record := r.db.Model(&Role{}).Where("role = ?", name).First(&role)

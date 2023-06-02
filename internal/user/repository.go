@@ -2,6 +2,7 @@ package user
 
 type Reader interface {
 	FindByEmail(email string) (*User, error)
+	FindByCode(code string) (*User, error)
 	GetRoleByName(name string) (*Role, error)
 	FindAll() ([]*User, error)
 }

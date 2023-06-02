@@ -13,7 +13,7 @@ func NewMariaDBRepository(db *gorm.DB) Repository {
 }
 
 func (r *mariaDBRepository) Store(wallet *Wallet) (uint64, error) {
-	result := r.db.Create(&wallet)
+	result := r.db.Save(&wallet)
 	if result.Error != nil {
 		return 0, result.Error
 	}
@@ -34,4 +34,19 @@ func (r *mariaDBRepository) ListByUser(userCode string) ([]*Wallet, error) {
 	}
 
 	return wallets, nil
+}
+
+func (r *mariaDBRepository) FindByCode(code string) (*Wallet, error) {
+	var wallet Wallet
+	record := r.db.Model(&Wallet{}).
+		Preload("User").
+		Preload("Collaborators").
+		Where("code = ?", code).
+		First(&wallet)
+
+	if record.Error != nil {
+		return nil, record.Error
+	}
+
+	return &wallet, nil
 }

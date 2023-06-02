@@ -2,6 +2,7 @@ package wallet
 
 type Reader interface {
 	ListByUser(userCode string) ([]*Wallet, error)
+	FindByCode(walletCode string) (*Wallet, error)
 }
 
 type Writer interface {

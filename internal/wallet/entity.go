@@ -54,6 +54,6 @@ type WalletResponse struct {
 }
 
 type WalletCollaboratorRequest struct {
-	code     string `json:"user_code"`
-	function int    `json:"function"`
+	UserCode string `json:"user_code"`
+	Function int    `json:"function"`
 }
