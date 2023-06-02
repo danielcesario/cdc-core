@@ -22,8 +22,8 @@ func (h *Handler) InitRouter() *gin.Engine {
 		{
 			securedAdmin.POST("/plans", h.CreatePlan)
 			securedAdmin.GET("/plans", h.ListPlans)
-			securedAdmin.GET("/plans/{planCode}", h.GetPlan)
-			securedAdmin.PATCH("/plans/{planCode}", h.UpdatePlan)
+			securedAdmin.GET("/plans/:planCode", h.GetPlan)
+			securedAdmin.PATCH("/plans/:planCode", h.UpdatePlan)
 			securedAdmin.GET("/users", h.GetUsers)
 		}
 
@@ -36,8 +36,8 @@ func (h *Handler) InitRouter() *gin.Engine {
 				securedWallet.POST("/", h.CreateWallet)
 				securedWallet.GET("/", h.ListWallets)
 				securedWallet.PUT("/:walletCode/collaborator", h.AddCollaborator)
-				securedWallet.GET("/{walletCode}", h.FakeResponse)
-				securedWallet.PATCH("/{walletCode}", h.FakeResponse)
+				securedWallet.GET("/:walletCode", h.FakeResponse)
+				securedWallet.DELETE("/:walletCode", h.FakeResponse)
 			}
 
 			// User Area
