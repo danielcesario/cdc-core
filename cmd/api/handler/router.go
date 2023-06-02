@@ -36,8 +36,7 @@ func (h *Handler) InitRouter() *gin.Engine {
 				securedWallet.POST("/", h.CreateWallet)
 				securedWallet.GET("/", h.ListWallets)
 				securedWallet.PUT("/:walletCode/collaborator", h.AddCollaborator)
-				securedWallet.GET("/:walletCode", h.FakeResponse)
-				securedWallet.DELETE("/:walletCode", h.FakeResponse)
+				securedWallet.GET("/:walletCode", h.GetWallet)
 			}
 
 			// User Area

@@ -91,3 +91,22 @@ func (s *WalletService) AddCollaborator(ctx context.Context, walletCode string, 
 
 	return nil
 }
+
+func (s *WalletService) GetByCode(ctx context.Context, code string) (*WalletResponse, error) {
+	wallet, err := s.repository.FindByCode(code)
+	if err != nil {
+		return nil, err
+	}
+
+	userEmail := ctx.Value("user_email").(string)
+	currentUser, err := s.userRepository.FindByEmail(userEmail)
+	if err != nil {
+		return nil, err
+	}
+
+	if wallet.UserID != currentUser.ID {
+		return nil, errors.New("invalid wallet owner")
+	}
+
+	return wallet.ToResponse(), nil
+}

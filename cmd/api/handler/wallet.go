@@ -12,6 +12,7 @@ type WalletService interface {
 	Create(ctx context.Context, request wallet.WalletRequest) (*wallet.WalletResponse, error)
 	List(ctx context.Context) ([]*wallet.WalletResponse, error)
 	AddCollaborator(ctx context.Context, walletCode string, request wallet.WalletCollaboratorRequest) error
+	GetByCode(ctx context.Context, code string) (*wallet.WalletResponse, error)
 }
 
 type WalletHandler struct {
@@ -71,4 +72,17 @@ func (h *Handler) AddCollaborator(context *gin.Context) {
 	}
 
 	context.Status(http.StatusOK)
+}
+
+func (h *Handler) GetWallet(context *gin.Context) {
+	walletCode := context.Param("walletCode")
+
+	response, err := h.wallet.service.GetByCode(context, walletCode)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	context.JSON(http.StatusOK, response)
 }
