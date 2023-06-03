@@ -2,6 +2,7 @@ package database
 
 import (
 	"github.com/danielcesario/cdc-core/internal/plan"
+	"github.com/danielcesario/cdc-core/internal/transaction"
 	"github.com/danielcesario/cdc-core/internal/user"
 	"github.com/danielcesario/cdc-core/internal/wallet"
 	"gorm.io/gorm"
@@ -15,6 +16,9 @@ func UpdateSchema(db *gorm.DB) {
 		&user.User{},
 		&plan.Plan{},
 		&wallet.Wallet{},
+		&transaction.PaymentMethod{},
+		&transaction.Transaction{},
+		&transaction.Instalment{},
 	)
 
 	roleSuperAdmin := &user.Role{Role: "SUPER_ADMIN"}
