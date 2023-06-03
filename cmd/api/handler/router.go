@@ -39,6 +39,23 @@ func (h *Handler) InitRouter() *gin.Engine {
 				securedWallet.GET("/:walletCode", h.GetWallet)
 			}
 
+			// Payment Method Area
+			securedPaymentMethod := panel.Group("/payment-methods").Use(middlewares.Auth())
+			{
+				securedPaymentMethod.POST("/", h.FakeResponse)
+				securedPaymentMethod.GET("/", h.FakeResponse)
+				securedPaymentMethod.GET("/:paymentMethodCode", h.FakeResponse)
+				securedPaymentMethod.PUT("/:paymentMethodCode", h.FakeResponse)
+			}
+
+			// Transaction Area
+			securedTransaction := panel.Group("/transactions").Use(middlewares.Auth())
+			{
+				securedTransaction.POST("/", h.FakeResponse)
+				securedTransaction.GET("/:transactionCode", h.FakeResponse)
+				securedTransaction.POST("/search", h.FakeResponse)
+			}
+
 			// User Area
 			securedUser := panel.Group("/user").Use(middlewares.Auth())
 			{
