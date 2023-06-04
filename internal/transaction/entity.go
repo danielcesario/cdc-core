@@ -3,6 +3,7 @@ package transaction
 import (
 	"time"
 
+	paymentmethod "github.com/danielcesario/cdc-core/internal/payment-method"
 	"github.com/danielcesario/cdc-core/internal/user"
 	"github.com/danielcesario/cdc-core/internal/wallet"
 	"gorm.io/gorm"
@@ -44,12 +45,13 @@ type Transaction struct {
 	User             user.User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	WalletID         uint64
 	Wallet           wallet.Wallet `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	PaymentType      PaymentType
 	PaymentMethodID  uint64
-	PaymentMethod    PaymentMethod `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Instalments      []Instalment
+	PaymentMethod    paymentmethod.PaymentMethod `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Entries          []Entry
 }
 
-type Instalment struct {
+type Entry struct {
 	gorm.Model
 	ID               uint64 `gorm:"autoIncrement"`
 	Code             string
@@ -58,14 +60,4 @@ type Instalment struct {
 	Amount           int
 	DueDate          time.Time
 	InstalmentStatus InstalmentStatus
-}
-
-type PaymentMethod struct {
-	gorm.Model
-	ID          uint64 `gorm:"autoIncrement"`
-	Code        string
-	PaymentType PaymentType
-	Description string
-	DueDay      int
-	CloseDay    int
 }
