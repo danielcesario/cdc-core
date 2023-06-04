@@ -7,16 +7,18 @@ import (
 )
 
 type Handler struct {
-	user   *UserHandler
-	plan   *PlanHandler
-	wallet *WalletHandler
+	user          *UserHandler
+	plan          *PlanHandler
+	wallet        *WalletHandler
+	paymentMethod *PaymentMethodHandler
 }
 
-func NewHandler(user *UserHandler, plan *PlanHandler, wallet *WalletHandler) *Handler {
+func NewHandler(user *UserHandler, plan *PlanHandler, wallet *WalletHandler, paymentMethod *PaymentMethodHandler) *Handler {
 	return &Handler{
-		user:   user,
-		plan:   plan,
-		wallet: wallet,
+		user:          user,
+		plan:          plan,
+		wallet:        wallet,
+		paymentMethod: paymentMethod,
 	}
 }
 

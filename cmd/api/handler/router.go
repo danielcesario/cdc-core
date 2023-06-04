@@ -42,7 +42,7 @@ func (h *Handler) InitRouter() *gin.Engine {
 			// Payment Method Area
 			securedPaymentMethod := panel.Group("/payment-methods").Use(middlewares.Auth())
 			{
-				securedPaymentMethod.POST("/", h.FakeResponse)
+				securedPaymentMethod.POST("/", h.CreatePaymentMethod)
 				securedPaymentMethod.GET("/", h.FakeResponse)
 				securedPaymentMethod.GET("/:paymentMethodCode", h.FakeResponse)
 				securedPaymentMethod.PUT("/:paymentMethodCode", h.FakeResponse)
