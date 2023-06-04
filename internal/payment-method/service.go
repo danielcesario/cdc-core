@@ -7,19 +7,19 @@ import (
 	"github.com/google/uuid"
 )
 
-type TransactionService struct {
+type PaymentMethodService struct {
 	repository     Repository
 	userRepository user.Repository
 }
 
-func NewWalletService(repository Repository, userRepository user.Repository) *TransactionService {
-	return &TransactionService{
+func NewWalletService(repository Repository, userRepository user.Repository) *PaymentMethodService {
+	return &PaymentMethodService{
 		repository:     repository,
 		userRepository: userRepository,
 	}
 }
 
-func (s *TransactionService) CreatePaymentMethod(ctx context.Context, request PaymentMethodRequest) (*PaymentMethodResponse, error) {
+func (s *PaymentMethodService) Create(ctx context.Context, request PaymentMethodRequest) (*PaymentMethodResponse, error) {
 	userEmail := ctx.Value("user_email").(string)
 	currentUser, err := s.userRepository.FindByEmail(userEmail)
 	if err != nil {
@@ -37,4 +37,23 @@ func (s *TransactionService) CreatePaymentMethod(ctx context.Context, request Pa
 	}
 
 	return paymentMethod.toResponse(), nil
+}
+
+func (s *PaymentMethodService) List(ctx context.Context) (response []*PaymentMethodResponse, err error) {
+	userEmail := ctx.Value("user_email").(string)
+	currentUser, err := s.userRepository.FindByEmail(userEmail)
+	if err != nil {
+		return
+	}
+
+	result, err := s.repository.ListByUser(currentUser.Code)
+	if err != nil {
+		return
+	}
+
+	for _, paymentMethod := range result {
+		response = append(response, paymentMethod.toResponse())
+	}
+
+	return
 }

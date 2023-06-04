@@ -9,7 +9,8 @@ import (
 )
 
 type PaymentMethodService interface {
-	CreatePaymentMethod(ctx context.Context, request paymentmethod.PaymentMethodRequest) (*paymentmethod.PaymentMethodResponse, error)
+	Create(ctx context.Context, request paymentmethod.PaymentMethodRequest) (*paymentmethod.PaymentMethodResponse, error)
+	List(ctx context.Context) ([]*paymentmethod.PaymentMethodResponse, error)
 }
 
 type PaymentMethodHandler struct {
@@ -30,7 +31,7 @@ func (h *Handler) CreatePaymentMethod(context *gin.Context) {
 		return
 	}
 
-	response, err := h.paymentMethod.service.CreatePaymentMethod(context, request)
+	response, err := h.paymentMethod.service.Create(context, request)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		context.Abort()
@@ -38,4 +39,15 @@ func (h *Handler) CreatePaymentMethod(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusCreated, response)
+}
+
+func (h *Handler) ListPaymentMethod(context *gin.Context) {
+	response, err := h.paymentMethod.service.List(context)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	context.JSON(http.StatusOK, response)
 }

@@ -1,6 +1,7 @@
 package paymentmethod
 
 type Reader interface {
+	ListByUser(userCode string) ([]*PaymentMethod, error)
 }
 
 type Writer interface {
