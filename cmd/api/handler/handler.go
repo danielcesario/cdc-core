@@ -11,14 +11,17 @@ type Handler struct {
 	plan          *PlanHandler
 	wallet        *WalletHandler
 	paymentMethod *PaymentMethodHandler
+	category      *CategoryHandler
 }
 
-func NewHandler(user *UserHandler, plan *PlanHandler, wallet *WalletHandler, paymentMethod *PaymentMethodHandler) *Handler {
+func NewHandler(user *UserHandler, plan *PlanHandler, wallet *WalletHandler,
+	paymentMethod *PaymentMethodHandler, category *CategoryHandler) *Handler {
 	return &Handler{
 		user:          user,
 		plan:          plan,
 		wallet:        wallet,
 		paymentMethod: paymentMethod,
+		category:      category,
 	}
 }
 

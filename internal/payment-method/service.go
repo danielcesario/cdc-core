@@ -13,7 +13,7 @@ type PaymentMethodService struct {
 	userRepository user.Repository
 }
 
-func NewWalletService(repository Repository, userRepository user.Repository) *PaymentMethodService {
+func NewPaymentMethodService(repository Repository, userRepository user.Repository) *PaymentMethodService {
 	return &PaymentMethodService{
 		repository:     repository,
 		userRepository: userRepository,

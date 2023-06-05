@@ -50,9 +50,9 @@ func (h *Handler) InitRouter() *gin.Engine {
 			// Category Area
 			securedCategory := panel.Group("/categories").Use(middlewares.Auth())
 			{
-				securedCategory.POST("/", h.FakeResponse)
-				securedCategory.GET("/", h.FakeResponse)
-				securedCategory.PUT("/:categoryCode", h.FakeResponse)
+				securedCategory.POST("/", h.CreateCategory)
+				securedCategory.GET("/", h.ListCategory)
+				securedCategory.PUT("/:categoryCode", h.UpdateCategory)
 			}
 
 			// Transaction Area

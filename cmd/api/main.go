@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/danielcesario/cdc-core/cmd/api/handler"
+	"github.com/danielcesario/cdc-core/internal/category"
 	"github.com/danielcesario/cdc-core/internal/database"
 	paymentmethod "github.com/danielcesario/cdc-core/internal/payment-method"
 	"github.com/danielcesario/cdc-core/internal/plan"
@@ -55,8 +56,13 @@ func main() {
 
 	// Payment Methods Dependecies
 	paymentMethodRepo := paymentmethod.NewMariaDBRepository(db)
-	paymentMethodService := paymentmethod.NewWalletService(paymentMethodRepo, userRepo)
+	paymentMethodService := paymentmethod.NewPaymentMethodService(paymentMethodRepo, userRepo)
 	paymentMethodHandler := handler.NewPaymentMethodHandler(paymentMethodService)
+
+	// Category Dependecies
+	categoryRepo := category.NewMariaDBRepository(db)
+	categoryService := category.NewCategoryService(categoryRepo, userRepo)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
 
 	// General Handler
 	handler := handler.NewHandler(
@@ -64,6 +70,7 @@ func main() {
 		planHandler,
 		walletHandler,
 		paymentMethodHandler,
+		categoryHandler,
 	)
 
 	router := handler.InitRouter()
