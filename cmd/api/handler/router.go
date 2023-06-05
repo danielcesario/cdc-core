@@ -47,6 +47,14 @@ func (h *Handler) InitRouter() *gin.Engine {
 				securedPaymentMethod.PUT("/:paymentMethodCode", h.UpdatePaymentMethod)
 			}
 
+			// Category Area
+			securedCategory := panel.Group("/categories").Use(middlewares.Auth())
+			{
+				securedCategory.POST("/", h.FakeResponse)
+				securedCategory.GET("/", h.FakeResponse)
+				securedCategory.PUT("/:categoryCode", h.FakeResponse)
+			}
+
 			// Transaction Area
 			securedTransaction := panel.Group("/transactions").Use(middlewares.Auth())
 			{
