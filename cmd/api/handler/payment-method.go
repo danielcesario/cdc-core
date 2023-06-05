@@ -11,6 +11,7 @@ import (
 type PaymentMethodService interface {
 	Create(ctx context.Context, request paymentmethod.PaymentMethodRequest) (*paymentmethod.PaymentMethodResponse, error)
 	List(ctx context.Context) ([]*paymentmethod.PaymentMethodResponse, error)
+	Update(ctx context.Context, code string, request paymentmethod.PaymentMethodRequest) (*paymentmethod.PaymentMethodResponse, error)
 }
 
 type PaymentMethodHandler struct {
@@ -50,4 +51,24 @@ func (h *Handler) ListPaymentMethod(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusOK, response)
+}
+
+func (h *Handler) UpdatePaymentMethod(context *gin.Context) {
+	var request paymentmethod.PaymentMethodRequest
+	if err := context.ShouldBindJSON(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	paymentMethodCode := context.Param("paymentMethodCode")
+
+	response, err := h.paymentMethod.service.Update(context, paymentMethodCode, request)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	context.JSON(http.StatusCreated, response)
 }

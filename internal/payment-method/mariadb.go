@@ -33,3 +33,17 @@ func (r *mariaDBRepository) ListByUser(userCode string) ([]*PaymentMethod, error
 
 	return paymentMethods, nil
 }
+
+func (r *mariaDBRepository) FindByCode(code string) (*PaymentMethod, error) {
+	var paymentMethod PaymentMethod
+	record := r.db.Model(&PaymentMethod{}).
+		Preload("User").
+		Where("code = ?", code).
+		First(&paymentMethod)
+
+	if record.Error != nil {
+		return nil, record.Error
+	}
+
+	return &paymentMethod, nil
+}

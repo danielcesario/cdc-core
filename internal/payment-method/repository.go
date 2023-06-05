@@ -2,6 +2,7 @@ package paymentmethod
 
 type Reader interface {
 	ListByUser(userCode string) ([]*PaymentMethod, error)
+	FindByCode(code string) (*PaymentMethod, error)
 }
 
 type Writer interface {

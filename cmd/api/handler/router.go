@@ -44,7 +44,7 @@ func (h *Handler) InitRouter() *gin.Engine {
 			{
 				securedPaymentMethod.POST("/", h.CreatePaymentMethod)
 				securedPaymentMethod.GET("/", h.ListPaymentMethod)
-				securedPaymentMethod.PUT("/:paymentMethodCode", h.FakeResponse)
+				securedPaymentMethod.PUT("/:paymentMethodCode", h.UpdatePaymentMethod)
 			}
 
 			// Transaction Area
