@@ -3,6 +3,7 @@ package transaction
 import (
 	"time"
 
+	"github.com/danielcesario/cdc-core/internal/category"
 	paymentmethod "github.com/danielcesario/cdc-core/internal/payment-method"
 	"github.com/danielcesario/cdc-core/internal/user"
 	"github.com/danielcesario/cdc-core/internal/wallet"
@@ -48,6 +49,8 @@ type Transaction struct {
 	PaymentType      PaymentType
 	PaymentMethodID  uint64
 	PaymentMethod    paymentmethod.PaymentMethod `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CategoryID       uint64
+	Category         category.Category `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Entries          []Entry
 }
 
