@@ -9,6 +9,7 @@ import (
 	"github.com/danielcesario/cdc-core/internal/database"
 	paymentmethod "github.com/danielcesario/cdc-core/internal/payment-method"
 	"github.com/danielcesario/cdc-core/internal/plan"
+	"github.com/danielcesario/cdc-core/internal/transaction"
 	"github.com/danielcesario/cdc-core/internal/user"
 	"github.com/danielcesario/cdc-core/internal/wallet"
 	"gorm.io/driver/mysql"
@@ -64,6 +65,17 @@ func main() {
 	categoryService := category.NewCategoryService(categoryRepo, userRepo)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 
+	// Transaction Dependecies
+	transactionRepo := transaction.NewMariaDBRepository(db)
+	transactionService := transaction.NewTransactionService(
+		transactionRepo,
+		userRepo,
+		walletRepo,
+		paymentMethodRepo,
+		categoryRepo,
+	)
+	transactionHandler := handler.NewTransactionHandler(transactionService)
+
 	// General Handler
 	handler := handler.NewHandler(
 		userHandler,
@@ -71,6 +83,7 @@ func main() {
 		walletHandler,
 		paymentMethodHandler,
 		categoryHandler,
+		transactionHandler,
 	)
 
 	router := handler.InitRouter()

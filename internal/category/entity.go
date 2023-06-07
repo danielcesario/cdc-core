@@ -24,8 +24,8 @@ func (c *Category) toResponse() *CategoryResponse {
 }
 
 type CategoryRequest struct {
-	Description string
-	Color       string
+	Description string `json:"description`
+	Color       string `json:"color"`
 }
 
 func (c *CategoryRequest) toCategory() *Category {
@@ -36,7 +36,7 @@ func (c *CategoryRequest) toCategory() *Category {
 }
 
 type CategoryResponse struct {
-	Code        string
-	Description string
-	Color       string
+	Code        string `json:"code`
+	Description string `json:"description`
+	Color       string `json:"color`
 }
