@@ -4,6 +4,7 @@ import (
 	"github.com/danielcesario/cdc-core/internal/category"
 	paymentmethod "github.com/danielcesario/cdc-core/internal/payment-method"
 	"github.com/danielcesario/cdc-core/internal/plan"
+	"github.com/danielcesario/cdc-core/internal/transaction"
 	"github.com/danielcesario/cdc-core/internal/user"
 	"github.com/danielcesario/cdc-core/internal/wallet"
 	"gorm.io/gorm"
@@ -19,6 +20,8 @@ func UpdateSchema(db *gorm.DB) {
 		&wallet.Wallet{},
 		&paymentmethod.PaymentMethod{},
 		&category.Category{},
+		&transaction.Transaction{},
+		&transaction.Entry{},
 	)
 
 	roleSuperAdmin := &user.Role{Role: "SUPER_ADMIN"}
