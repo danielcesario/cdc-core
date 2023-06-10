@@ -32,7 +32,7 @@ func (p PaymentType) String() string {
 	return paymentTypeNames[p]
 }
 
-func getPaymentType(s string) (PaymentType, error) {
+func GetPaymentType(s string) (PaymentType, error) {
 	switch s {
 	case "BANKSLIP":
 		return BANKSLIP, nil
@@ -78,7 +78,7 @@ type PaymentMethodRequest struct {
 }
 
 func (p *PaymentMethodRequest) toPaymentMethod() *PaymentMethod {
-	paymentType, err := getPaymentType(p.PaymentType)
+	paymentType, err := GetPaymentType(p.PaymentType)
 	if err != nil {
 		panic(err)
 	}

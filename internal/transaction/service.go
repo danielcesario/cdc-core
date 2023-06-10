@@ -20,6 +20,28 @@ type TransactionService struct {
 	categoryRepository      category.Repository
 }
 
+type Processor interface {
+	Process(transaction *Transaction) error
+}
+
+func GetPaymentProcessor(paymentType paymentmethod.PaymentType) Processor {
+	switch paymentType {
+	case paymentmethod.CREDIT_CARD:
+		return &ProcessCreditCard{}
+	case paymentmethod.DEBIT_CARD:
+		return &ProcessDebitCard{}
+	case paymentmethod.BANKSLIP:
+		return &ProcessBankSlip{}
+	case paymentmethod.TRANSFER:
+		return &ProcessTransfer{}
+	case paymentmethod.MONEY:
+		return &ProcessMoney{}
+	default:
+		// Retornar um processador padrão ou lidar com o pagamento desconhecido
+		return nil
+	}
+}
+
 func NewTransactionService(repository Repository, userRepository user.Repository, walletRepository wallet.Repository,
 	paymentmethodRepository paymentmethod.Repository, categoryRepository category.Repository) *TransactionService {
 	return &TransactionService{
@@ -61,6 +83,9 @@ func (s *TransactionService) Create(ctx context.Context, request TransactionRequ
 		return
 	}
 
+	processor := GetPaymentProcessor(transaction.PaymentType)
+	processor.Process(transaction)
+
 	savedId, err := s.repository.Store(*transaction)
 	if err != nil {
 		return
@@ -97,6 +122,7 @@ func (s *TransactionService) validatePaymentMethod(code string, transaction Tran
 		return err
 	}
 
+	transaction.PaymentMethod = *paymentmethod
 	return nil
 }
 
@@ -111,5 +137,6 @@ func (s *TransactionService) validateCategory(code string, transaction Transacti
 		return err
 	}
 
+	transaction.Category = *category
 	return nil
 }

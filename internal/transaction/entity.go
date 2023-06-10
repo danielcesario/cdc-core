@@ -28,16 +28,6 @@ func (i TransactionType) String() string {
 	}
 }
 
-type PaymentType int
-
-const (
-	BANKSLIP PaymentType = iota // 0
-	TRANSFER
-	CREDIT_CARD
-	DEBIT_CARD
-	MONEY
-)
-
 type InstalmentStatus int
 
 const (
@@ -68,7 +58,7 @@ type Transaction struct {
 	User             user.User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	WalletID         uint64
 	Wallet           wallet.Wallet `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	PaymentType      PaymentType
+	PaymentType      paymentmethod.PaymentType
 	PaymentMethodID  uint64
 	PaymentMethod    paymentmethod.PaymentMethod `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	CategoryID       uint64
@@ -119,7 +109,7 @@ func (e *Entry) toResponse() *EntryResponse {
 type TransactionRequest struct {
 	TotalAmount      int    `json:"total_amount"`
 	TotalInstalments int    `json:"total_instalments"`
-	TransactionType  string `json:"transaction_type"`
+	PaymentType      string `json:"payment_type"`
 	Description      string `json:"description"`
 	Wallet           string `json:"wallet"`
 	PaymentMethod    string `json:"payment_method"`
@@ -127,10 +117,13 @@ type TransactionRequest struct {
 }
 
 func (tr *TransactionRequest) toTransaction() *Transaction {
+	paymentType, _ := paymentmethod.GetPaymentType(tr.PaymentType)
+
 	return &Transaction{
 		TotalAmount:      tr.TotalAmount,
 		TotalInstalments: tr.TotalInstalments,
 		Description:      tr.Description,
+		PaymentType:      paymentType,
 		Wallet:           wallet.Wallet{Code: tr.Wallet},
 		PaymentMethod:    paymentmethod.PaymentMethod{Code: tr.PaymentMethod},
 		Category:         category.Category{Code: tr.Category},
