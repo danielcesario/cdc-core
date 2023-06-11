@@ -1,6 +1,7 @@
 package transaction
 
 type Reader interface {
+	FindByCode(transactionCode string) (*Transaction, error)
 }
 
 type Writer interface {

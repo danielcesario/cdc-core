@@ -96,6 +96,25 @@ func (s *TransactionService) Create(ctx context.Context, request TransactionRequ
 	return
 }
 
+func (s *TransactionService) GetByCode(ctx context.Context, code string) (*TransactionResponse, error) {
+	transaction, err := s.repository.FindByCode(code)
+	if err != nil {
+		return nil, err
+	}
+
+	userEmail := ctx.Value("user_email").(string)
+	currentUser, err := s.userRepository.FindByEmail(userEmail)
+	if err != nil {
+		return nil, err
+	}
+
+	if transaction.UserID != currentUser.ID {
+		return nil, errors.New("invalid wallet owner")
+	}
+
+	return transaction.toResponse(), nil
+}
+
 func (s *TransactionService) validateWallet(code string, transaction Transaction) error {
 	wallet, err := s.walletRepository.FindByCode(code)
 	if err != nil {

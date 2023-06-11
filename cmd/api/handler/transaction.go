@@ -10,6 +10,7 @@ import (
 
 type TransactionService interface {
 	Create(ctx context.Context, request transaction.TransactionRequest) (*transaction.TransactionResponse, error)
+	GetByCode(ctx context.Context, code string) (*transaction.TransactionResponse, error)
 }
 
 type TransactionHandler struct {
@@ -38,4 +39,17 @@ func (h *Handler) CreateTransaction(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusCreated, response)
+}
+
+func (h *Handler) GetTransaction(context *gin.Context) {
+	transactionCode := context.Param("transactionCode")
+
+	response, err := h.transaction.service.GetByCode(context, transactionCode)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	context.JSON(http.StatusOK, response)
 }

@@ -63,7 +63,7 @@ type Transaction struct {
 	PaymentMethod    paymentmethod.PaymentMethod `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	CategoryID       uint64
 	Category         category.Category `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Entries          []Entry
+	Entries          []Entry           `gorm:"foreignKey:TransactionID"`
 }
 
 func (t *Transaction) toResponse() *TransactionResponse {
@@ -91,7 +91,6 @@ type Entry struct {
 	ID               uint64 `gorm:"autoIncrement"`
 	Code             string
 	TransactionID    uint64
-	Transaction      Transaction `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Amount           int
 	DueDate          time.Time
 	InstalmentStatus InstalmentStatus

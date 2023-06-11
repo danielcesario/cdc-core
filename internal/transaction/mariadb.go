@@ -19,3 +19,21 @@ func (r *mariaDBRepository) Store(transaction Transaction) (uint64, error) {
 	}
 	return transaction.ID, nil
 }
+
+func (r *mariaDBRepository) FindByCode(code string) (*Transaction, error) {
+	var transaction Transaction
+	record := r.db.Model(&Transaction{}).
+		Preload("User").
+		Preload("Wallet").
+		Preload("PaymentMethod").
+		Preload("Category").
+		Preload("Entries").
+		Where("code = ?", code).
+		First(&transaction)
+
+	if record.Error != nil {
+		return nil, record.Error
+	}
+
+	return &transaction, nil
+}

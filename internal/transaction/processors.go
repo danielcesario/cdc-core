@@ -54,7 +54,7 @@ func (p *ProcessMoney) Process(transaction *Transaction) error {
 func processOneInstalment(transaction *Transaction) {
 	entry := Entry{
 		Code:             uuid.NewString(),
-		Transaction:      *transaction,
+		TransactionID:    transaction.ID,
 		Amount:           transaction.TotalAmount,
 		DueDate:          time.Now(),
 		InstalmentStatus: PRESENTED,
