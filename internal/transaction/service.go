@@ -68,23 +68,28 @@ func (s *TransactionService) Create(ctx context.Context, request TransactionRequ
 	g := new(errgroup.Group)
 
 	g.Go(func() error {
-		return s.validateWallet(request.Wallet, *transaction)
+		return s.validateWallet(request.Wallet, transaction)
 	})
 
 	g.Go(func() error {
-		return s.validatePaymentMethod(request.PaymentMethod, *transaction)
+		if request.PaymentMethod != "" {
+			return s.validatePaymentMethod(request.PaymentMethod, transaction)
+		}
+		return nil
 	})
 
 	g.Go(func() error {
-		return s.validateCategory(request.Category, *transaction)
+		return s.validateCategory(request.Category, transaction)
 	})
 
 	if err = g.Wait(); err != nil {
 		return
 	}
 
-	processor := GetPaymentProcessor(transaction.PaymentType)
-	processor.Process(transaction)
+	if transaction.TransactionType == DEBIT {
+		processor := GetPaymentProcessor(transaction.PaymentMethod.PaymentType)
+		processor.Process(transaction)
+	}
 
 	savedId, err := s.repository.Store(*transaction)
 	if err != nil {
@@ -102,6 +107,27 @@ func (s *TransactionService) GetByCode(ctx context.Context, code string) (*Trans
 		return nil, err
 	}
 
+	g := new(errgroup.Group)
+
+	g.Go(func() error {
+		return s.validateWallet(transaction.Wallet.Code, transaction)
+	})
+
+	g.Go(func() error {
+		if transaction.PaymentMethodID > 0 {
+			return s.validatePaymentMethod(transaction.PaymentMethod.Code, transaction)
+		}
+		return nil
+	})
+
+	g.Go(func() error {
+		return s.validateCategory(transaction.Category.Code, transaction)
+	})
+
+	if err = g.Wait(); err != nil {
+		return nil, err
+	}
+
 	userEmail := ctx.Value("user_email").(string)
 	currentUser, err := s.userRepository.FindByEmail(userEmail)
 	if err != nil {
@@ -115,7 +141,7 @@ func (s *TransactionService) GetByCode(ctx context.Context, code string) (*Trans
 	return transaction.toResponse(), nil
 }
 
-func (s *TransactionService) validateWallet(code string, transaction Transaction) error {
+func (s *TransactionService) validateWallet(code string, transaction *Transaction) error {
 	wallet, err := s.walletRepository.FindByCode(code)
 	if err != nil {
 		return err
@@ -130,7 +156,7 @@ func (s *TransactionService) validateWallet(code string, transaction Transaction
 	return nil
 }
 
-func (s *TransactionService) validatePaymentMethod(code string, transaction Transaction) error {
+func (s *TransactionService) validatePaymentMethod(code string, transaction *Transaction) error {
 	paymentmethod, err := s.paymentmethodRepository.FindByCode(code)
 	if err != nil {
 		return err
@@ -145,7 +171,7 @@ func (s *TransactionService) validatePaymentMethod(code string, transaction Tran
 	return nil
 }
 
-func (s *TransactionService) validateCategory(code string, transaction Transaction) error {
+func (s *TransactionService) validateCategory(code string, transaction *Transaction) error {
 	category, err := s.categoryRepository.FindByCode(code)
 	if err != nil {
 		return err

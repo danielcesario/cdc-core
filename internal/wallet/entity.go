@@ -50,7 +50,7 @@ func (wr *WalletRequest) toWallet() *Wallet {
 type WalletResponse struct {
 	Name          string              `json:"name"`
 	Code          string              `json:"code"`
-	Collaborators []user.UserResponse `json:"collaboratos"`
+	Collaborators []user.UserResponse `json:"collaboratos,omitempty"`
 }
 
 type WalletCollaboratorRequest struct {

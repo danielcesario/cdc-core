@@ -1,6 +1,7 @@
 package transaction
 
 import (
+	"errors"
 	"time"
 
 	"github.com/danielcesario/cdc-core/internal/category"
@@ -26,6 +27,16 @@ func (i TransactionType) String() string {
 	default:
 		return "Invalid Status"
 	}
+}
+
+func GetTransactionType(s string) (TransactionType, error) {
+	switch s {
+	case "CREDIT":
+		return CREDIT, nil
+	case "DEBIT":
+		return DEBIT, nil
+	}
+	return -1, errors.New("unknown Transaction Type: " + s)
 }
 
 type InstalmentStatus int
@@ -58,7 +69,6 @@ type Transaction struct {
 	User             user.User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	WalletID         uint64
 	Wallet           wallet.Wallet `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	PaymentType      paymentmethod.PaymentType
 	PaymentMethodID  uint64
 	PaymentMethod    paymentmethod.PaymentMethod `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	CategoryID       uint64
@@ -78,7 +88,7 @@ func (t *Transaction) toResponse() *TransactionResponse {
 		TotalInstalments: t.TotalInstalments,
 		TransactionType:  t.TransactionType.String(),
 		Description:      t.Description,
-		User:             user.UserResponse{Code: t.User.Code, Name: t.User.Name},
+		User:             user.UserResponse{Code: t.User.Code, Name: t.User.Name, Email: t.User.Email},
 		Wallet:           wallet.WalletResponse{Name: t.Wallet.Name, Code: t.Wallet.Code},
 		PaymentMethod:    paymentmethod.PaymentMethodResponse{Code: t.PaymentMethod.Code, Description: t.PaymentMethod.Description, PaymentType: t.PaymentMethod.PaymentType.String()},
 		Category:         category.CategoryResponse{Code: t.Category.Code, Description: t.Category.Description, Color: t.Category.Color},
@@ -108,7 +118,7 @@ func (e *Entry) toResponse() *EntryResponse {
 type TransactionRequest struct {
 	TotalAmount      int    `json:"total_amount"`
 	TotalInstalments int    `json:"total_instalments"`
-	PaymentType      string `json:"payment_type"`
+	TransactionType  string `json:"transaction_type"`
 	Description      string `json:"description"`
 	Wallet           string `json:"wallet"`
 	PaymentMethod    string `json:"payment_method"`
@@ -116,13 +126,13 @@ type TransactionRequest struct {
 }
 
 func (tr *TransactionRequest) toTransaction() *Transaction {
-	paymentType, _ := paymentmethod.GetPaymentType(tr.PaymentType)
+	transactionType, _ := GetTransactionType(tr.TransactionType)
 
 	return &Transaction{
 		TotalAmount:      tr.TotalAmount,
 		TotalInstalments: tr.TotalInstalments,
 		Description:      tr.Description,
-		PaymentType:      paymentType,
+		TransactionType:  transactionType,
 		Wallet:           wallet.Wallet{Code: tr.Wallet},
 		PaymentMethod:    paymentmethod.PaymentMethod{Code: tr.PaymentMethod},
 		Category:         category.Category{Code: tr.Category},

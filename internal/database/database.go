@@ -29,4 +29,6 @@ func UpdateSchema(db *gorm.DB) {
 
 	roleUserDefault := &user.Role{Role: "USER_DEFAULT"}
 	db.Clauses(clause.OnConflict{DoNothing: true}).Create(&roleUserDefault)
+
+	db.Set("gorm:auto_preload", true)
 }
