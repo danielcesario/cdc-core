@@ -156,5 +156,5 @@ type TransactionResponse struct {
 	Wallet           wallet.WalletResponse               `json:"wallet"`
 	PaymentMethod    paymentmethod.PaymentMethodResponse `json:"payment_method"`
 	Category         category.CategoryResponse           `json:"category"`
-	Entries          []EntryResponse                     `json:"entries"`
+	Entries          []EntryResponse                     `json:"entries,omitempty"`
 }
