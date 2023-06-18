@@ -21,7 +21,7 @@ func (p *ProcessCreditCard) Process(transaction *Transaction) error {
 	}
 
 	instalmentValue := transaction.TotalAmount / transaction.TotalInstalments
-	// TODO: Verify round difference
+	roundDiff := transaction.TotalAmount % transaction.TotalInstalments
 
 	for i := 0; i < transaction.TotalInstalments; i++ {
 		entry := Entry{
@@ -30,6 +30,10 @@ func (p *ProcessCreditCard) Process(transaction *Transaction) error {
 			Amount:           instalmentValue,
 			DueDate:          firstInstalment.AddDate(0, i, 0),
 			InstalmentStatus: SCHEDULLED,
+		}
+
+		if i == (transaction.TotalInstalments-1) && roundDiff > 0 {
+			entry.Amount += roundDiff
 		}
 
 		transaction.Entries = append(transaction.Entries, entry)
