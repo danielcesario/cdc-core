@@ -89,6 +89,9 @@ func (s *TransactionService) Create(ctx context.Context, request TransactionRequ
 	if transaction.TransactionType == DEBIT {
 		processor := GetPaymentProcessor(transaction.PaymentMethod.PaymentType)
 		processor.Process(transaction)
+	} else {
+		processor := &ProcessCreditTransaction{}
+		processor.Process(transaction)
 	}
 
 	savedId, err := s.repository.Store(*transaction)

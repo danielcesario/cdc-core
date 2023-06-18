@@ -51,7 +51,7 @@ func (i InstalmentStatus) String() string {
 	case 0:
 		return "SCHEDULLED"
 	case 1:
-		return "PRESENT"
+		return "PRESENTED"
 	default:
 		return "Invalid Status"
 	}
