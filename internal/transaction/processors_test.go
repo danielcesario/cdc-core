@@ -77,6 +77,7 @@ func TestMultipleIntalmentProcessor(t *testing.T) {
 		TransactionDate           time.Time
 		ExpectedInstalmentsAmount []int
 		ExpectedInstalmentsDates  []time.Time
+		ExpectedInstalmentStatus  []transaction.InstalmentStatus
 	}{
 		{
 			Title:                     "Process Transactions with two equal instalments before card close day",
@@ -95,6 +96,24 @@ func TestMultipleIntalmentProcessor(t *testing.T) {
 			TransactionDate:           mockTime(t, 2023, 1, 15),
 			ExpectedInstalmentsAmount: []int{25000, 25000},
 			ExpectedInstalmentsDates:  []time.Time{mockTime(t, 2023, 2, 15), mockTime(t, 2023, 3, 15)},
+		},
+		{
+			Title:                     "Process Transactions with different status",
+			CardCloseDay:              10,
+			TotalAmount:               50000,
+			TotalInstalments:          2,
+			TransactionDate:           mockTime(t, time.Now().Year(), int(time.Now().Month()), 5),
+			ExpectedInstalmentsAmount: []int{25000, 25000},
+			ExpectedInstalmentsDates:  []time.Time{mockTime(t, time.Now().Year(), int(time.Now().Month()), 5), mockTime(t, time.Now().Year(), int(time.Now().Month()), 5).AddDate(0, 1, 0)},
+			ExpectedInstalmentStatus:  []transaction.InstalmentStatus{transaction.PRESENTED, transaction.SCHEDULLED},
+		},
+		{
+			Title:                     "Process Transactions with difference on round value",
+			CardCloseDay:              10,
+			TotalAmount:               50033,
+			TotalInstalments:          4,
+			TransactionDate:           mockTime(t, 2023, 1, 15),
+			ExpectedInstalmentsAmount: []int{12508, 12508, 12508, 12509},
 		},
 	}
 
@@ -120,7 +139,14 @@ func TestMultipleIntalmentProcessor(t *testing.T) {
 				assert.Equal(t, scenario.TotalInstalments, len(mockTransaction.Entries))
 				for i, entry := range mockTransaction.Entries {
 					assert.Equal(t, scenario.ExpectedInstalmentsAmount[i], entry.Amount)
-					assert.Equal(t, scenario.ExpectedInstalmentsDates[i], entry.DueDate)
+
+					if scenario.ExpectedInstalmentsDates != nil {
+						assert.Equal(t, scenario.ExpectedInstalmentsDates[i], entry.DueDate)
+					}
+
+					if scenario.ExpectedInstalmentStatus != nil {
+						assert.Equal(t, scenario.ExpectedInstalmentStatus[i], entry.InstalmentStatus)
+					}
 				}
 			})
 
