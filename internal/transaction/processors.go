@@ -11,25 +11,35 @@ type ProcessCreditCard struct {
 
 func (p *ProcessCreditCard) Process(transaction *Transaction) error {
 	paymentMethod := transaction.PaymentMethod
-	currentMonthCloseDay := time.Date(time.Now().Year(), time.Now().Month(), paymentMethod.CloseDay, 0, 0, 0, 0, time.UTC)
+	txDate := transaction.Date
+	currentMonthCloseDay := time.Date(txDate.Year(), txDate.Month(), paymentMethod.CloseDay, 0, 0, 0, 0, time.UTC)
 
 	var firstInstalment time.Time
-	if time.Now().After(currentMonthCloseDay) {
-		firstInstalment = time.Now().AddDate(0, 1, 0)
+	if txDate.After(currentMonthCloseDay) {
+		firstInstalment = transaction.Date.AddDate(0, 1, 0)
 	} else {
-		firstInstalment = time.Now()
+		firstInstalment = transaction.Date
 	}
 
 	instalmentValue := transaction.TotalAmount / transaction.TotalInstalments
 	roundDiff := transaction.TotalAmount % transaction.TotalInstalments
 
 	for i := 0; i < transaction.TotalInstalments; i++ {
+		instalmentDueDate := firstInstalment.AddDate(0, i, 0)
+
+		var instalmentStatus InstalmentStatus
+		if instalmentDueDate.After(time.Now()) {
+			instalmentStatus = SCHEDULLED
+		} else {
+			instalmentStatus = PRESENTED
+		}
+
 		entry := Entry{
 			Code:             uuid.NewString(),
 			TransactionID:    transaction.ID,
 			Amount:           instalmentValue,
-			DueDate:          firstInstalment.AddDate(0, i, 0),
-			InstalmentStatus: SCHEDULLED,
+			DueDate:          instalmentDueDate,
+			InstalmentStatus: instalmentStatus,
 		}
 
 		if i == (transaction.TotalInstalments-1) && roundDiff > 0 {
@@ -83,12 +93,19 @@ func (p *ProcessCreditTransaction) Process(transaction *Transaction) error {
 }
 
 func processOneInstalment(transaction *Transaction) {
+	var instalmentStatus InstalmentStatus
+	if transaction.Date.After(time.Now()) {
+		instalmentStatus = SCHEDULLED
+	} else {
+		instalmentStatus = PRESENTED
+	}
+
 	entry := Entry{
 		Code:             uuid.NewString(),
 		TransactionID:    transaction.ID,
 		Amount:           transaction.TotalAmount,
-		DueDate:          time.Now(),
-		InstalmentStatus: PRESENTED,
+		DueDate:          transaction.Date,
+		InstalmentStatus: instalmentStatus,
 	}
 
 	transaction.Entries = append(transaction.Entries, entry)

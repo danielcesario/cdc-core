@@ -65,6 +65,7 @@ type Transaction struct {
 	TotalInstalments int
 	TransactionType  TransactionType
 	Description      string
+	Date             time.Time
 	UserID           uint64
 	User             user.User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	WalletID         uint64
@@ -88,6 +89,7 @@ func (t *Transaction) toResponse() *TransactionResponse {
 		TotalInstalments: t.TotalInstalments,
 		TransactionType:  t.TransactionType.String(),
 		Description:      t.Description,
+		Date:             t.Date.Format("2006-01-02T15:04:05 -07:00:00"),
 		User:             user.UserResponse{Code: t.User.Code, Name: t.User.Name, Email: t.User.Email},
 		Wallet:           wallet.WalletResponse{Name: t.Wallet.Name, Code: t.Wallet.Code},
 		PaymentMethod:    paymentmethod.PaymentMethodResponse{Code: t.PaymentMethod.Code, Description: t.PaymentMethod.Description, PaymentType: t.PaymentMethod.PaymentType.String()},
@@ -110,7 +112,7 @@ func (e *Entry) toResponse() *EntryResponse {
 	return &EntryResponse{
 		Code:             e.Code,
 		Amount:           e.Amount,
-		DueDate:          e.DueDate.Format("2006-01-02T15:04:05 -07:00:00"),
+		DueDate:          e.DueDate.Format(time.RFC3339),
 		InstalmentStatus: e.InstalmentStatus.String(),
 	}
 }
@@ -120,6 +122,7 @@ type TransactionRequest struct {
 	TotalInstalments int    `json:"total_instalments"`
 	TransactionType  string `json:"transaction_type"`
 	Description      string `json:"description"`
+	Date             string `json:"date"`
 	Wallet           string `json:"wallet"`
 	PaymentMethod    string `json:"payment_method"`
 	Category         string `json:"category"`
@@ -127,12 +130,17 @@ type TransactionRequest struct {
 
 func (tr *TransactionRequest) toTransaction() *Transaction {
 	transactionType, _ := GetTransactionType(tr.TransactionType)
+	requestDate, err := time.Parse(time.RFC3339, tr.Date)
+	if err != nil {
+		requestDate = time.Now()
+	}
 
 	return &Transaction{
 		TotalAmount:      tr.TotalAmount,
 		TotalInstalments: tr.TotalInstalments,
 		Description:      tr.Description,
 		TransactionType:  transactionType,
+		Date:             requestDate,
 		Wallet:           wallet.Wallet{Code: tr.Wallet},
 		PaymentMethod:    paymentmethod.PaymentMethod{Code: tr.PaymentMethod},
 		Category:         category.Category{Code: tr.Category},
@@ -152,6 +160,7 @@ type TransactionResponse struct {
 	TotalInstalments int                                 `json:"total_instalments"`
 	TransactionType  string                              `json:"transaction_type"`
 	Description      string                              `json:"description"`
+	Date             string                              `json:"date"`
 	User             user.UserResponse                   `json:"user"`
 	Wallet           wallet.WalletResponse               `json:"wallet"`
 	PaymentMethod    paymentmethod.PaymentMethodResponse `json:"payment_method"`
