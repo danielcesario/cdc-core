@@ -59,8 +59,8 @@ func (h *Handler) InitRouter() *gin.Engine {
 			securedTransaction := panel.Group("/transactions").Use(middlewares.Auth())
 			{
 				securedTransaction.POST("/", h.CreateTransaction)
-				securedTransaction.GET("/:transactionCode", h.GetTransaction) //TODO: Entries are empty
-				securedTransaction.POST("/search", h.FakeResponse)
+				securedTransaction.GET("/:transactionCode", h.GetTransaction)
+				securedTransaction.POST("/search", h.SerachTransactions)
 			}
 
 			// User Area

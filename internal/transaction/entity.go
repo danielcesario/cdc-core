@@ -167,3 +167,55 @@ type TransactionResponse struct {
 	Category         category.CategoryResponse           `json:"category"`
 	Entries          []EntryResponse                     `json:"entries,omitempty"`
 }
+
+type SearchLimit struct {
+	Size int `json:"size"`
+	Page int `json:"page"`
+}
+
+type SerchSort struct {
+	Field     string `json:"field"`
+	Direction string `json:"direction"`
+}
+
+type SearchParams struct {
+	Sort  SerchSort   `json:"sort"`
+	Limit SearchLimit `json:"limit"`
+}
+
+type SearchTransactionRequest struct {
+	From   string       `json:"from"`
+	To     string       `json:"to"`
+	Wallet string       `json:"wallet"`
+	Params SearchParams `json:"params"`
+}
+
+type SerchItemResponse struct {
+	TransactionType string                              `json:"transaction_type"`
+	Amount          int                                 `json:"amount"`
+	Date            string                              `json:"date"`
+	Wallet          wallet.WalletResponse               `json:"wallet"`
+	PaymentMethod   paymentmethod.PaymentMethodResponse `json:"payment_method"`
+	Category        category.CategoryResponse           `json:"category"`
+}
+
+type SearchPageResponse struct {
+	Content       []TransactionSearchResult `json:"content"`
+	TotalElements int                       `json:"total_elements"`
+	TotalPages    int                       `json:"total_pages"`
+	Page          int                       `json:"page"`
+	Size          int                       `json:"size"`
+	Sort          string                    `json:"sort"`
+	IsLast        bool                      `json:"is_last"`
+}
+
+type TransactionSearchResult struct {
+	Code          string    `json:"code"`
+	Type          string    `json:"type"`
+	Amount        int       `json:"amount"`
+	DueDate       time.Time `json:"due_date"`
+	Description   string    `json:"description"`
+	User          string    `json:"user"`
+	PaymentMethod string    `json:"payment_method"`
+	Category      string    `json:"category"`
+}
